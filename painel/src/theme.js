@@ -1,8 +1,24 @@
 export const C = {
-  dark:"#0F1117",surface:"#181C27",card:"#1E2336",border:"#2A2F45",
+  dark:"#0F1117",surface:"#181C27",card:"#1E2336",cardHi:"#242A40",border:"#2A2F45",
   accent:"#E94560",blue:"#3B82F6",green:"#22C55E",
   yellow:"#F59E0B",purple:"#8B5CF6",orange:"#FB923C",
   text:"#F0F2F7",muted:"#8891AA",white:"#FFFFFF",
+
+  // Camada de profundidade — o app parecia chapado sem isso. Gradientes sutis
+  // (nunca berrantes) + sombras coloridas fazem os elementos primários
+  // "flutuarem" em vez de serem só um retângulo com borda.
+  gradAccent:"linear-gradient(135deg,#F2597A 0%,#E94560 45%,#C81E4A 100%)",
+  gradBlue:"linear-gradient(135deg,#60A5FA 0%,#3B82F6 100%)",
+  gradGreen:"linear-gradient(135deg,#4ADE80 0%,#22C55E 100%)",
+  gradPurple:"linear-gradient(135deg,#A78BFA 0%,#8B5CF6 100%)",
+  gradSurface:"linear-gradient(165deg,#1E2336 0%,#181C27 100%)",
+  gradDark:"radial-gradient(circle at 20% -10%,#1E2336 0%,#0F1117 55%)",
+
+  shadowSm:"0 1px 2px #00000033",
+  shadowMd:"0 4px 16px #00000044",
+  shadowLg:"0 16px 48px #00000066",
+  glowAccent:"0 0 0 1px #E9456022, 0 8px 24px -8px #E9456066",
+  glowBlue:"0 0 0 1px #3B82F622, 0 8px 24px -8px #3B82F666",
 };
 
 export const STATUS_DEF = {

@@ -1,3 +1,4 @@
+import { Menu, Bell, Plus } from "lucide-react";
 import { C } from "../theme";
 import { Btn } from "./ui";
 import { useIsMobile } from "../lib/useIsMobile";
@@ -5,17 +6,17 @@ import { useIsMobile } from "../lib/useIsMobile";
 export const Topbar = ({titulo,notifOpen,setNotifOpen,notifs,onNovaOS,onMenuClick}) => {
   const isMobile = useIsMobile();
   return (
-    <div style={{background:C.surface,borderBottom:`1px solid ${C.border}`,padding:isMobile?"0 12px":"0 24px",height:58,display:"flex",alignItems:"center",justifyContent:"space-between",position:"sticky",top:0,zIndex:5,gap:8}}>
+    <div style={{background:C.surface+"F2",backdropFilter:"blur(10px)",WebkitBackdropFilter:"blur(10px)",borderBottom:`1px solid ${C.border}`,padding:isMobile?"0 12px":"0 24px",height:58,display:"flex",alignItems:"center",justifyContent:"space-between",position:"sticky",top:0,zIndex:5,gap:8}}>
       <div style={{display:"flex",alignItems:"center",gap:10,minWidth:0}}>
-        {isMobile&&<button onClick={onMenuClick} style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:8,padding:"7px 10px",color:C.text,cursor:"pointer",fontSize:15,flexShrink:0}}>☰</button>}
-        <h1 style={{fontSize:16,fontWeight:700,color:C.text,margin:0,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{titulo}</h1>
+        {isMobile&&<button onClick={onMenuClick} style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:8,padding:"7px 8px",color:C.text,cursor:"pointer",display:"flex",flexShrink:0}}><Menu size={17}/></button>}
+        <h1 style={{fontSize:16,fontWeight:700,color:C.text,margin:0,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",letterSpacing:-0.2}}>{titulo}</h1>
       </div>
       <div style={{display:"flex",gap:9,alignItems:"center",flexShrink:0}}>
         <div style={{position:"relative"}}>
-          <button onClick={()=>setNotifOpen(!notifOpen)} style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:8,padding:"7px 12px",color:C.muted,cursor:"pointer",fontSize:15,position:"relative"}}>
-            🔔{notifs.length>0&&<span style={{position:"absolute",top:4,right:4,width:7,height:7,borderRadius:"50%",background:C.accent,border:`2px solid ${C.surface}`}}/>}
+          <button onClick={()=>setNotifOpen(!notifOpen)} style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:9,padding:"7px 9px",color:C.muted,cursor:"pointer",position:"relative",display:"flex"}}>
+            <Bell size={16}/>{notifs.length>0&&<span style={{position:"absolute",top:5,right:5,width:7,height:7,borderRadius:"50%",background:C.accent,border:`2px solid ${C.surface}`,boxShadow:`0 0 6px ${C.accent}`}}/>}
           </button>
-          {notifOpen&&<div style={{position:"absolute",right:0,top:42,width:"min(90vw,350px)",background:C.card,border:`1px solid ${C.border}`,borderRadius:12,boxShadow:"0 8px 32px #00000066",zIndex:100,maxHeight:400,overflowY:"auto"}}>
+          {notifOpen&&<div className="mm-scale-in" style={{position:"absolute",right:0,top:46,width:"min(90vw,350px)",background:C.gradSurface,border:`1px solid ${C.border}`,borderRadius:14,boxShadow:C.shadowLg,zIndex:100,maxHeight:400,overflowY:"auto"}}>
             <div style={{padding:"12px 16px",borderBottom:`1px solid ${C.border}`,fontSize:13,fontWeight:700,color:C.text}}>
               Notificações {notifs.length>0&&<span style={{background:C.accent,color:C.white,borderRadius:10,padding:"1px 7px",fontSize:11,marginLeft:6}}>{notifs.length}</span>}
             </div>
@@ -26,7 +27,7 @@ export const Topbar = ({titulo,notifOpen,setNotifOpen,notifs,onNovaOS,onMenuClic
             </div>)}
           </div>}
         </div>
-        <Btn onClick={onNovaOS}>{isMobile?"+ OS":"+ Nova OS"}</Btn>
+        <Btn onClick={onNovaOS}><Plus size={15} strokeWidth={2.5}/>{isMobile?"OS":"Nova OS"}</Btn>
       </div>
     </div>
   );

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { C } from "../theme";
 import { supabase } from "../lib/supabase";
 import { Inp, Btn } from "../components/ui";
+import { AuthShell } from "../components/AuthShell";
 
 // Cadastro self-service (trial 60 dias, plano §8.2/§14.6). Dois passos porque
 // são duas operações distintas no Supabase: criar a conta (auth.users) e só
@@ -44,42 +45,35 @@ export const Cadastro = ({ contaCriada = false, onConcluido, onVoltarLogin }) =>
   };
 
   return (
-    <div style={{ minHeight: "100vh", background: C.dark, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Inter',-apple-system,sans-serif" }}>
-      <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 16, padding: "40px 28px", width: "min(92vw,420px)", boxSizing: "border-box", boxShadow: "0 8px 40px #00000088" }}>
-        <div style={{ textAlign: "center", marginBottom: 28 }}>
-          <div style={{ fontSize: 28, fontWeight: 900, color: C.text }}>Monta<span style={{ color: C.accent }}>Movel</span></div>
-          <div style={{ fontSize: 13, color: C.muted, marginTop: 6 }}>{passo === 1 ? "Crie sua conta — 60 dias grátis" : "Agora, sobre sua empresa"}</div>
-        </div>
-
-        <div style={{ display: "flex", gap: 6, marginBottom: 24 }}>
-          {[1, 2].map((n) => <div key={n} style={{ flex: 1, height: 3, borderRadius: 2, background: passo >= n ? C.accent : C.border }} />)}
-        </div>
-
-        {erro && <div style={{ background: C.accent + "18", border: `1px solid ${C.accent}44`, borderRadius: 8, padding: "10px 14px", fontSize: 13, color: C.accent, marginBottom: 16 }}>{erro}</div>}
-
-        {passo === 1 ? (
-          <>
-            <Inp label="E-mail" value={conta.email} onChange={(v) => setConta({ ...conta, email: v })} type="email" placeholder="voce@empresa.com" required />
-            <Inp label="Senha" value={conta.senha} onChange={(v) => setConta({ ...conta, senha: v })} type="password" placeholder="Mínimo 10 caracteres" required />
-            <Btn onClick={criarConta} disabled={loading}>{loading ? "Criando..." : "Continuar"}</Btn>
-            <div style={{ marginTop: 16, textAlign: "center" }}>
-              <button onClick={onVoltarLogin} style={{ background: "none", border: "none", color: C.blue, cursor: "pointer", fontSize: 12 }}>Já tenho conta — entrar</button>
-            </div>
-          </>
-        ) : (
-          <>
-            <Inp label="Seu nome" value={empresa.nome_admin} onChange={(v) => e({ nome_admin: v })} required />
-            <Inp label="Razão Social" value={empresa.razao_social} onChange={(v) => e({ razao_social: v })} required />
-            <Inp label="CNPJ (opcional para MEI/começando)" value={empresa.cnpj} onChange={(v) => e({ cnpj: v })} />
-            <Inp label="Telefone" value={empresa.telefone} onChange={(v) => e({ telefone: v })} />
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(160px,1fr))", gap: 12 }}>
-              <Inp label="Cidade" value={empresa.cidade} onChange={(v) => e({ cidade: v })} />
-              <Inp label="Estado" value={empresa.estado} onChange={(v) => e({ estado: v })} placeholder="PA" />
-            </div>
-            <Btn onClick={criarEmpresa} disabled={loading}>{loading ? "Criando empresa..." : "Começar meu trial de 60 dias"}</Btn>
-          </>
-        )}
+    <AuthShell subtitle={passo === 1 ? "Crie sua conta — 60 dias grátis" : "Agora, sobre sua empresa"}>
+      <div style={{ display: "flex", gap: 6, marginBottom: 24 }}>
+        {[1, 2].map((n) => <div key={n} style={{ flex: 1, height: 3, borderRadius: 2, background: passo >= n ? C.gradAccent : C.border, transition: "background 0.3s" }} />)}
       </div>
-    </div>
+
+      {erro && <div style={{ background: C.accent + "18", border: `1px solid ${C.accent}44`, borderRadius: 9, padding: "10px 14px", fontSize: 13, color: C.accent, marginBottom: 16 }}>{erro}</div>}
+
+      {passo === 1 ? (
+        <>
+          <Inp label="E-mail" value={conta.email} onChange={(v) => setConta({ ...conta, email: v })} type="email" placeholder="voce@empresa.com" required />
+          <Inp label="Senha" value={conta.senha} onChange={(v) => setConta({ ...conta, senha: v })} type="password" placeholder="Mínimo 10 caracteres" required />
+          <Btn onClick={criarConta} disabled={loading} full>{loading ? "Criando..." : "Continuar"}</Btn>
+          <div style={{ marginTop: 16, textAlign: "center" }}>
+            <button onClick={onVoltarLogin} style={{ background: "none", border: "none", color: C.blue, cursor: "pointer", fontSize: 12 }}>Já tenho conta — entrar</button>
+          </div>
+        </>
+      ) : (
+        <>
+          <Inp label="Seu nome" value={empresa.nome_admin} onChange={(v) => e({ nome_admin: v })} required />
+          <Inp label="Razão Social" value={empresa.razao_social} onChange={(v) => e({ razao_social: v })} required />
+          <Inp label="CNPJ (opcional para MEI/começando)" value={empresa.cnpj} onChange={(v) => e({ cnpj: v })} />
+          <Inp label="Telefone" value={empresa.telefone} onChange={(v) => e({ telefone: v })} />
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(160px,1fr))", gap: 12 }}>
+            <Inp label="Cidade" value={empresa.cidade} onChange={(v) => e({ cidade: v })} />
+            <Inp label="Estado" value={empresa.estado} onChange={(v) => e({ estado: v })} placeholder="PA" />
+          </div>
+          <Btn onClick={criarEmpresa} disabled={loading} full>{loading ? "Criando empresa..." : "Começar meu trial de 60 dias"}</Btn>
+        </>
+      )}
+    </AuthShell>
   );
 };

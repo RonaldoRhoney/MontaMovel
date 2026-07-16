@@ -1,0 +1,66 @@
+@import "@fontsource/inter/400.css";
+@import "@fontsource/inter/500.css";
+@import "@fontsource/inter/600.css";
+@import "@fontsource/inter/700.css";
+@import "@fontsource/inter/800.css";
+
+* { box-sizing: border-box; }
+html, body, #root { margin: 0; padding: 0; height: 100%; }
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+::selection { background: #E9456055; color: #fff; }
+
+/* Scrollbar fina — o padrão do navegador é o que mais grita "app de 2005" */
+* { scrollbar-width: thin; scrollbar-color: #2A2F45 transparent; }
+*::-webkit-scrollbar { width: 8px; height: 8px; }
+*::-webkit-scrollbar-track { background: transparent; }
+*::-webkit-scrollbar-thumb { background: #2A2F45; border-radius: 8px; }
+*::-webkit-scrollbar-thumb:hover { background: #3A4160; }
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.96); }
+  to   { opacity: 1; transform: scale(1); }
+}
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+@keyframes pulseGlow {
+  0%, 100% { box-shadow: 0 0 0 0 #E9456055; }
+  50%      { box-shadow: 0 0 0 6px #E9456000; }
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.mm-animate-in { animation: fadeInUp 0.35s cubic-bezier(0.16,1,0.3,1) both; }
+.mm-fade-in { animation: fadeIn 0.2s ease both; }
+.mm-scale-in { animation: scaleIn 0.18s cubic-bezier(0.16,1,0.3,1) both; }
+
+.mm-skeleton {
+  background: linear-gradient(90deg, #1E2336 25%, #262c45 37%, #1E2336 63%);
+  background-size: 400% 100%;
+  animation: shimmer 1.4s ease infinite;
+  border-radius: 8px;
+}
+
+.mm-spin { animation: spin 0.8s linear infinite; }
+
+button, a, input, select, textarea { font-family: inherit; }
+button { transition: transform 0.15s ease, box-shadow 0.2s ease, background 0.2s ease, border-color 0.2s ease, opacity 0.2s ease; }
+button:active:not(:disabled) { transform: scale(0.97); }
+
+.mm-card-hover { transition: transform 0.2s cubic-bezier(0.16,1,0.3,1), box-shadow 0.2s ease, border-color 0.2s ease; }
+.mm-card-hover:hover { transform: translateY(-2px); }
