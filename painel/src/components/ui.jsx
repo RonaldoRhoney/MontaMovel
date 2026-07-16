@@ -61,11 +61,11 @@ export const Btn = ({children,onClick,variant="primary",small,disabled,full}) =>
   </button>;
 };
 
-export const Inp = ({label,value,onChange,placeholder,type="text",required}) => (
+export const Inp = ({label,value,onChange,placeholder,type="text",required,disabled}) => (
   <div style={{marginBottom:14}}>
     {label&&<label style={{fontSize:11,color:C.muted,fontWeight:700,display:"block",marginBottom:5,letterSpacing:0.3}}>{label.toUpperCase()}{required&&<span style={{color:C.accent}}> *</span>}</label>}
-    <input type={type} value={value||""} onChange={e=>onChange(e.target.value)} placeholder={placeholder}
-      style={{width:"100%",padding:"9px 13px",borderRadius:9,border:`1px solid ${C.border}`,background:C.surface,color:C.text,fontSize:13,outline:"none",boxSizing:"border-box",transition:"border-color 0.15s, box-shadow 0.15s"}}
+    <input type={type} value={value||""} onChange={e=>onChange(e.target.value)} placeholder={placeholder} disabled={disabled}
+      style={{width:"100%",padding:"9px 13px",borderRadius:9,border:`1px solid ${C.border}`,background:disabled?C.card:C.surface,color:disabled?C.muted:C.text,fontSize:13,outline:"none",boxSizing:"border-box",transition:"border-color 0.15s, box-shadow 0.15s",opacity:disabled?0.6:1,cursor:disabled?"not-allowed":"text"}}
       onFocus={e=>{e.target.style.borderColor=C.accent+"88";e.target.style.boxShadow=`0 0 0 3px ${C.accent}1a`;}}
       onBlur={e=>{e.target.style.borderColor=C.border;e.target.style.boxShadow="none";}}/>
   </div>

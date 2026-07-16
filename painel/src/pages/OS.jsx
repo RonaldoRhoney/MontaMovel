@@ -12,9 +12,11 @@ export const OS = ({toast}) => {
   const [modal,setModal]   = useState(false);
   const [saving,setSaving] = useState(false);
 
-  // Passo 1 do modal: achar o pedido (venda já registrada) por número ou CPF —
-  // não redigitamos cliente/produto, eles já vêm amarrados à compra.
-  const [buscaPedido,setBuscaPedido] = useState("");
+  // Passo 1 do modal: achar o pedido (venda já registrada) por número OU CPF —
+  // não redigitamos cliente/produto, eles já vêm amarrados à compra. Os dois
+  // campos são mutuamente exclusivos: preencher um limpa o outro.
+  const [numeroPedido,setNumeroPedido] = useState("");
+  const [cpfCliente,setCpfCliente]     = useState("");
   const [buscando,setBuscando]       = useState(false);
   const [resultados,setResultados]   = useState([]);
   const [pedidoSel,setPedidoSel]     = useState(null);
@@ -38,25 +40,25 @@ export const OS = ({toast}) => {
   const PEDIDO_SELECT = "id,numero_pedido,data_compra,produto_id,produto_descricao,cliente_id,clientes(nome,telefone,logradouro,numero,complemento,bairro,cidade,estado,cep),produtos(nome)";
 
   const buscarPedido = async() => {
-    const termo = buscaPedido.trim();
-    if(!termo) return;
+    const pedido = numeroPedido.trim();
+    const cpf = cpfCliente.trim();
+    if(!pedido&&!cpf) return;
     setBuscando(true); setResultados([]);
-    const somenteDigitos = termo.replace(/\D/g,"");
-    if(somenteDigitos.length>=11){
-      const {data:cliente} = await supabase.from("clientes").select("id").eq("cpf_enc",termo).maybeSingle();
+    if(cpf){
+      const {data:cliente} = await supabase.from("clientes").select("id").eq("cpf_enc",cpf).maybeSingle();
       if(!cliente){ toast("Nenhum cliente encontrado com esse CPF.","error"); setBuscando(false); return; }
       const {data} = await supabase.from("pedidos").select(PEDIDO_SELECT).eq("cliente_id",cliente.id).eq("utilizado",false);
       setResultados(data||[]);
       if(!data?.length) toast("Esse cliente não tem pedidos disponíveis pra montagem.","error");
     } else {
-      const {data} = await supabase.from("pedidos").select(PEDIDO_SELECT).eq("numero_pedido",termo).eq("utilizado",false);
+      const {data} = await supabase.from("pedidos").select(PEDIDO_SELECT).eq("numero_pedido",pedido).eq("utilizado",false);
       setResultados(data||[]);
       if(!data?.length) toast("Pedido não encontrado ou já utilizado.","error");
     }
     setBuscando(false);
   };
 
-  const fecharModal = () => { setModal(false); setBuscaPedido(""); setResultados([]); setPedidoSel(null); setForm(blank); };
+  const fecharModal = () => { setModal(false); setNumeroPedido(""); setCpfCliente(""); setResultados([]); setPedidoSel(null); setForm(blank); };
   const f = v=>({...form,...v});
 
   const criar = async() => {
@@ -128,8 +130,12 @@ export const OS = ({toast}) => {
   return <div style={{padding:24}}>
     {modal&&<Modal title="Nova Ordem de Serviço" onClose={fecharModal}>
       {!pedidoSel ? <>
-        <Inp label="Número do Pedido ou CPF do Cliente" value={buscaPedido} onChange={setBuscaPedido} placeholder="Ex: PED-10234 ou 000.000.000-00"/>
-        <Btn onClick={buscarPedido} disabled={buscando||!buscaPedido.trim()} full>{buscando?"Buscando...":"Buscar Pedido"}</Btn>
+        <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(160px,1fr))",gap:12,alignItems:"start"}}>
+          <Inp label="Pedido" value={numeroPedido} onChange={v=>{setNumeroPedido(v);if(v)setCpfCliente("");}} placeholder="Ex: PED-10234" disabled={!!cpfCliente}/>
+          <Inp label="CPF do Cliente" value={cpfCliente} onChange={v=>{setCpfCliente(v);if(v)setNumeroPedido("");}} placeholder="000.000.000-00" disabled={!!numeroPedido}/>
+        </div>
+        <div style={{fontSize:11,color:C.muted,margin:"-8px 0 14px"}}>Preencha um ou outro — não os dois.</div>
+        <Btn onClick={buscarPedido} disabled={buscando||(!numeroPedido.trim()&&!cpfCliente.trim())} full>{buscando?"Buscando...":"Buscar Pedido"}</Btn>
 
         {resultados.length>0&&<div style={{marginTop:18}}>
           <div style={{fontSize:11,color:C.muted,fontWeight:700,marginBottom:8}}>{resultados.length} PEDIDO(S) DISPONÍVEL(EIS)</div>
