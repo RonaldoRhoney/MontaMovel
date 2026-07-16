@@ -14,7 +14,9 @@ export const Avatar = ({i,size=36,color=C.accent}) => (
 );
 
 export const KpiCard = ({label,value,sub,color=C.accent,icon}) => {
-  const Icon = typeof icon==="function" ? icon : null;
+  // Ícones lucide-react são objetos forwardRef (typeof "object"), não
+  // funções — só string (emoji) conta como "não é componente" aqui.
+  const Icon = icon && typeof icon!=="string" ? icon : null;
   return (
     <div className="mm-animate-in mm-card-hover" style={{position:"relative",background:C.gradSurface,border:`1px solid ${C.border}`,borderRadius:14,padding:"18px 20px",display:"flex",flexDirection:"column",gap:8,overflow:"hidden",boxShadow:C.shadowSm}}>
       <div style={{position:"absolute",top:-30,right:-30,width:90,height:90,borderRadius:"50%",background:color,opacity:0.10,filter:"blur(20px)"}}/>
