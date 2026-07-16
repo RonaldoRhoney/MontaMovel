@@ -1,0 +1,177 @@
+{
+  "name": "MontaMovel — Respostas do Cliente no WhatsApp (inbound)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "montamovel-whatsapp-inbound",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "name": "Webhook Evolution Inbound",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [-400, 0],
+      "webhookId": "montamovel-whatsapp-inbound",
+      "notes": "Aponte o webhook de mensagens recebidas do provedor WhatsApp (Evolution API / Z-API) pra cá. O formato do payload varia por provedor — ajuste o node 'Extrair Telefone e Texto' conforme a doc do seu provedor."
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// Evolution API costuma mandar algo como body.data.key.remoteJid e\n// body.data.message.conversation — ajuste aqui se o provedor for outro (Z-API etc.)\nconst b = $json.body?.data ?? $json.body ?? {};\nconst telefoneBruto = b.key?.remoteJid || b.from || '';\nconst telefone = telefoneBruto.replace('@s.whatsapp.net', '').replace(/\\D/g, '');\nconst texto = (b.message?.conversation || b.message?.extendedTextMessage?.text || b.text || '').trim();\n\nreturn { json: { telefone, texto, tenant_id: $env.MONTAMOVEL_TENANT_ID } };"
+      },
+      "name": "Extrair Telefone e Texto",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [-180, 0],
+      "notes": "Este workflow é por tenant: configure MONTAMOVEL_TENANT_ID no ambiente do n8n (ou duplique o workflow por cliente, se cada um tiver seu próprio número/instância)."
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.SUPABASE_URL}}/rest/v1/rpc/n8n_resolve_os_por_telefone",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "apikey", "value": "={{$env.SUPABASE_SERVICE_ROLE_KEY}}" },
+            { "name": "Authorization", "value": "=Bearer {{$env.SUPABASE_SERVICE_ROLE_KEY}}" },
+            { "name": "Content-Type", "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { \"p_tenant_id\": $json.tenant_id, \"p_telefone\": $json.telefone } }}",
+        "options": {}
+      },
+      "name": "Resolver OS pelo Telefone",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [40, 0]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "loose" },
+          "conditions": [
+            { "leftValue": "={{$json[0]?.token_cliente}}", "rightValue": "", "operator": { "type": "string", "operation": "notEmpty" } }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "name": "OS Encontrada?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [260, 0]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const texto = $('Extrair Telefone e Texto').item.json.texto.toLowerCase().trim();\nconst token = $json[0].token_cliente;\nconst status = $json[0].status;\n\nlet acao = null, score = null;\nif (/^(sim|confirmar|confirmo)$/.test(texto)) acao = 'confirmar';\nelse if (/^(n[aã]o|cancelar)$/.test(texto)) acao = 'cancelar';\nelse if (/^\\d{1,2}$/.test(texto) && status === 'Concluída com Sucesso') {\n  const n = parseInt(texto, 10);\n  if (n >= 0 && n <= 10) { acao = 'nps'; score = n; }\n}\n\nreturn { json: { acao, score, token, tenant_id: $json.tenant_id } };"
+      },
+      "name": "Interpretar Intenção",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [480, -60]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            { "conditions": { "conditions": [{ "leftValue": "={{$json.acao}}", "rightValue": "confirmar", "operator": { "type": "string", "operation": "equals" } }] }, "outputKey": "confirmar" },
+            { "conditions": { "conditions": [{ "leftValue": "={{$json.acao}}", "rightValue": "cancelar", "operator": { "type": "string", "operation": "equals" } }] }, "outputKey": "cancelar" },
+            { "conditions": { "conditions": [{ "leftValue": "={{$json.acao}}", "rightValue": "nps", "operator": { "type": "string", "operation": "equals" } }] }, "outputKey": "nps" }
+          ]
+        },
+        "fallbackOutput": "extra",
+        "options": {}
+      },
+      "name": "Qual Ação?",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [700, -60]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.SUPABASE_URL}}/rest/v1/rpc/portal_confirmar",
+        "sendHeaders": true,
+        "headerParameters": { "parameters": [{ "name": "apikey", "value": "={{$env.SUPABASE_ANON_KEY}}" }, { "name": "Content-Type", "value": "application/json" }] },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { \"p_token\": $json.token } }}",
+        "options": {}
+      },
+      "name": "RPC portal_confirmar",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [920, -180]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.SUPABASE_URL}}/rest/v1/rpc/portal_cancelar",
+        "sendHeaders": true,
+        "headerParameters": { "parameters": [{ "name": "apikey", "value": "={{$env.SUPABASE_ANON_KEY}}" }, { "name": "Content-Type", "value": "application/json" }] },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { \"p_token\": $json.token, \"p_motivo\": \"Cancelado via WhatsApp\" } }}",
+        "options": {}
+      },
+      "name": "RPC portal_cancelar",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [920, -60]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.SUPABASE_URL}}/rest/v1/rpc/portal_responder_nps",
+        "sendHeaders": true,
+        "headerParameters": { "parameters": [{ "name": "apikey", "value": "={{$env.SUPABASE_ANON_KEY}}" }, { "name": "Content-Type", "value": "application/json" }] },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { \"p_token\": $json.token, \"p_score\": $json.score, \"p_comentario\": null } }}",
+        "options": {}
+      },
+      "name": "RPC portal_responder_nps",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [920, 60]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.SUPABASE_FUNCTIONS_URL}}/n8n-inbound",
+        "sendHeaders": true,
+        "headerParameters": { "parameters": [{ "name": "X-MontaMovel-Signature", "value": "={{$env.MONTAMOVEL_SIGN_HELPER}}" }] },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { \"tipo\": \"mensagem_nao_mapeada\", \"tenant_id\": $json.tenant_id, \"telefone\": $('Extrair Telefone e Texto').item.json.telefone, \"texto_livre\": $('Extrair Telefone e Texto').item.json.texto } }}",
+        "options": {}
+      },
+      "name": "Registrar Mensagem Não Mapeada",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [920, 180],
+      "notes": "Cai aqui quando o texto não é SIM/NÃO/nota — vira um alerta pro atendente em vez de tentar adivinhar (evita ação errada por interpretação ruim de linguagem livre)."
+    }
+  ],
+  "connections": {
+    "Webhook Evolution Inbound": { "main": [[{ "node": "Extrair Telefone e Texto", "type": "main", "index": 0 }]] },
+    "Extrair Telefone e Texto": { "main": [[{ "node": "Resolver OS pelo Telefone", "type": "main", "index": 0 }]] },
+    "Resolver OS pelo Telefone": { "main": [[{ "node": "OS Encontrada?", "type": "main", "index": 0 }]] },
+    "OS Encontrada?": { "main": [[{ "node": "Interpretar Intenção", "type": "main", "index": 0 }], []] },
+    "Interpretar Intenção": { "main": [[{ "node": "Qual Ação?", "type": "main", "index": 0 }]] },
+    "Qual Ação?": {
+      "main": [
+        [{ "node": "RPC portal_confirmar", "type": "main", "index": 0 }],
+        [{ "node": "RPC portal_cancelar", "type": "main", "index": 0 }],
+        [{ "node": "RPC portal_responder_nps", "type": "main", "index": 0 }],
+        [{ "node": "Registrar Mensagem Não Mapeada", "type": "main", "index": 0 }]
+      ]
+    }
+  },
+  "active": false,
+  "settings": { "executionOrder": "v1" }
+}

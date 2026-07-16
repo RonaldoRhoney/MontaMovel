@@ -1,0 +1,89 @@
+{
+  "name": "MontaMovel — Notificações WhatsApp (outbound)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "montamovel-eventos",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "name": "Webhook Eventos MontaMovel",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [-200, 0],
+      "webhookId": "montamovel-eventos"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const evento = $json.body?.evento ?? $json.evento;\nconst tenantId = $json.body?.tenant_id ?? $json.tenant_id;\nconst d = ($json.body?.dados ?? $json.dados) || {};\n\nconst hora = (h) => (h ? String(h).slice(0, 5) : '');\n\nconst templates = {\n  confirmacao: `Olá ${d.cliente_nome}! Sua montagem (${d.produto_nome || 'seu móvel'}) está agendada para ${d.data_agendada} às ${hora(d.hora_agendada)}. Responda SIM para confirmar. Acompanhe: ${d.link_portal}`,\n  lembrete: `Olá ${d.cliente_nome}! Lembrete: amanhã (${d.data_agendada}) teremos um montador na sua casa às ${hora(d.hora_agendada)}. Confirma? ${d.link_portal}`,\n  em_rota: `Oi ${d.cliente_nome}! ${d.montador_nome || 'Seu montador'} está a caminho. Acompanhe em tempo real: ${d.link_portal}`,\n  nps: `Olá ${d.cliente_nome}! Como foi sua experiência com a montagem do(a) ${d.produto_nome || 'seu móvel'}? Avalie de 0 a 10: ${d.link_portal}`,\n  assistencia: `${d.cliente_nome}, identificamos um problema na sua montagem${d.motivo_assist ? ' (' + d.motivo_assist + ')' : ''}. Nossa equipe vai entrar em contato. Acompanhe: ${d.link_portal}`,\n  reagendamento: `${d.cliente_nome}, seu agendamento foi remarcado para ${d.data_agendada} às ${hora(d.hora_agendada)}. Confira: ${d.link_portal}`,\n};\n\nreturn {\n  json: {\n    telefone: d.cliente_whatsapp,\n    mensagem: templates[evento] || null,\n    tipo: evento,\n    os_id: d.os_id,\n    tenant_id: tenantId,\n    comunicacao_id: d.comunicacao_id,\n  },\n};"
+      },
+      "name": "Montar Mensagem",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [20, 0]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "loose" },
+          "conditions": [
+            { "leftValue": "={{$json.mensagem}}", "rightValue": "", "operator": { "type": "string", "operation": "notEmpty" } }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "name": "Tem Mensagem?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [240, 0]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.EVOLUTION_API_URL}}/message/sendText/{{$env.EVOLUTION_INSTANCE}}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [{ "name": "apikey", "value": "={{$env.EVOLUTION_API_KEY}}" }]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { \"number\": $json.telefone, \"text\": $json.mensagem } }}",
+        "options": {}
+      },
+      "name": "Enviar WhatsApp (Evolution API)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [460, -80]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.SUPABASE_FUNCTIONS_URL}}/n8n-inbound",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [{ "name": "X-MontaMovel-Signature", "value": "={{$env.MONTAMOVEL_SIGN_HELPER}}" }]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { \"tipo\": \"status_entrega\", \"tenant_id\": $json.tenant_id, \"comunicacao_id\": $json.comunicacao_id, \"status\": \"enviado\", \"provider_id\": $json.body?.key?.id } }}",
+        "options": {}
+      },
+      "name": "Registrar Entrega",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [680, -80],
+      "notes": "A assinatura HMAC precisa ser calculada com o webhook_secret do tenant (guarde-o como credential no n8n, não em env var global, se tiver múltiplos tenants)."
+    }
+  ],
+  "connections": {
+    "Webhook Eventos MontaMovel": { "main": [[{ "node": "Montar Mensagem", "type": "main", "index": 0 }]] },
+    "Montar Mensagem": { "main": [[{ "node": "Tem Mensagem?", "type": "main", "index": 0 }]] },
+    "Tem Mensagem?": { "main": [[{ "node": "Enviar WhatsApp (Evolution API)", "type": "main", "index": 0 }], []] },
+    "Enviar WhatsApp (Evolution API)": { "main": [[{ "node": "Registrar Entrega", "type": "main", "index": 0 }]] }
+  },
+  "active": false,
+  "settings": { "executionOrder": "v1" }
+}
