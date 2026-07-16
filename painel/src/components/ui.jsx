@@ -33,8 +33,8 @@ export const Pill = ({label,active,onClick}) => (
   <button onClick={onClick} style={{padding:"6px 13px",borderRadius:20,border:`1px solid ${active?C.accent:C.border}`,background:active?C.accent+"22":"transparent",color:active?C.accent:C.muted,fontSize:12,fontWeight:600,cursor:"pointer"}}>{label}</button>
 );
 
-export const Btn = ({children,onClick,variant="primary",small,disabled}) => (
-  <button onClick={onClick} disabled={disabled} style={{padding:small?"5px 12px":"8px 18px",borderRadius:8,border:variant==="ghost"?`1px solid ${C.border}`:"none",background:variant==="primary"?C.accent:variant==="ghost"?C.card:"transparent",color:variant==="primary"?C.white:variant==="danger"?C.accent:C.text,fontSize:small?12:13,fontWeight:600,cursor:disabled?"not-allowed":"pointer",opacity:disabled?0.5:1}}>
+export const Btn = ({children,onClick,variant="primary",small,disabled,full}) => (
+  <button onClick={onClick} disabled={disabled} style={{width:full?"100%":undefined,padding:small?"5px 12px":"8px 18px",borderRadius:8,border:variant==="ghost"?`1px solid ${C.border}`:"none",background:variant==="primary"?C.accent:variant==="ghost"?C.card:"transparent",color:variant==="primary"?C.white:variant==="danger"?C.accent:C.text,fontSize:small?12:13,fontWeight:600,cursor:disabled?"not-allowed":"pointer",opacity:disabled?0.5:1}}>
     {children}
   </button>
 );

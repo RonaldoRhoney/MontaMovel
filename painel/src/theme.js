@@ -23,4 +23,6 @@ export const STATUS_DEF = {
   "Inativo":              {bg:"#1E1E1E",text:"#8891AA",dot:"#8891AA"},
   "Beta":                 {bg:"#1E1B2A",text:"#8B5CF6",dot:"#8B5CF6"},
   "Zerado":               {bg:"#2A1520",text:"#E94560",dot:"#E94560"},
+  "Disponível":           {bg:"#0F2A1A",text:"#4ADE80",dot:"#4ADE80"},
+  "Utilizado":            {bg:"#1E1E1E",text:"#8891AA",dot:"#8891AA"},
 };

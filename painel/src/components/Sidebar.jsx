@@ -3,6 +3,7 @@ import { Avatar } from "./ui";
 
 const NAV = [
   {id:"dashboard",   icon:"◈",label:"Dashboard"},
+  {id:"pedidos",     icon:"🧾",label:"Pedidos"},
   {id:"os",          icon:"≡",label:"Ordens de Serviço"},
   {id:"agendamento", icon:"▦",label:"Agendamentos"},
   {id:"clientes",    icon:"👤",label:"Clientes"},

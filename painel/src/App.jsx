@@ -8,6 +8,7 @@ import { Topbar } from "./components/Topbar";
 import { AgenteIA } from "./components/AgenteIA";
 import { Toast } from "./components/ui";
 import { Dashboard } from "./pages/Dashboard";
+import { Pedidos } from "./pages/Pedidos";
 import { OS } from "./pages/OS";
 import { Agendamento } from "./pages/Agendamento";
 import { Clientes } from "./pages/Clientes";
@@ -58,7 +59,7 @@ export default function App() {
   const showToast=(msg,type="info")=>setToast({msg,type});
 
   const TITULOS = {
-    dashboard:"Dashboard",os:"Ordens de Serviço",agendamento:"Agendamentos",
+    dashboard:"Dashboard",pedidos:"Pedidos",os:"Ordens de Serviço",agendamento:"Agendamentos",
     clientes:"Clientes",montadores:"Montadores",produtos:"Produtos",
     rotas:"Rotas e Otimização",estoque:"Estoque",ponto:"Registro de Ponto (REP-P)",
     relatorios:"Relatórios e Filtros",comunicacao:"Comunicação — n8n",configuracoes:"Configurações",
@@ -66,7 +67,8 @@ export default function App() {
 
   const VIEWS = {
     dashboard:     <Dashboard/>,
-    os:            <OS toast={showToast}/>,
+    pedidos:       <Pedidos user={user} toast={showToast}/>,
+    os:            <OS toast={showToast} user={user}/>,
     agendamento:   <Agendamento toast={showToast}/>,
     clientes:      <Clientes toast={showToast}/>,
     montadores:    <Montadores toast={showToast}/>,
