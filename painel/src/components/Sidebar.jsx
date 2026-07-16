@@ -1,6 +1,6 @@
 import {
   LayoutGrid, ReceiptText, ClipboardList, CalendarDays, Users, HardHat,
-  Armchair, Route, PackageSearch, Clock, BarChart3, MessageCircle, Settings,
+  Armchair, Factory, Route, PackageSearch, Clock, BarChart3, MessageCircle, Settings,
 } from "lucide-react";
 import { C } from "../theme";
 import { Avatar } from "./ui";
@@ -14,6 +14,7 @@ const NAV = [
   {id:"clientes",    Icon:Users,          label:"Clientes"},
   {id:"montadores",  Icon:HardHat,        label:"Montadores"},
   {id:"produtos",    Icon:Armchair,       label:"Produtos"},
+  {id:"fabricantes", Icon:Factory,        label:"Fabricantes"},
   {id:"rotas",       Icon:Route,          label:"Rotas"},
   {id:"estoque",     Icon:PackageSearch,  label:"Estoque"},
   {id:"ponto",       Icon:Clock,          label:"Ponto"},

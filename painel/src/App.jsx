@@ -14,6 +14,7 @@ import { Agendamento } from "./pages/Agendamento";
 import { Clientes } from "./pages/Clientes";
 import { Montadores } from "./pages/Montadores";
 import { Produtos } from "./pages/Produtos";
+import { Fabricantes } from "./pages/Fabricantes";
 import { Rotas } from "./pages/Rotas";
 import { Estoque } from "./pages/Estoque";
 import { Ponto } from "./pages/Ponto";
@@ -61,7 +62,7 @@ export default function App() {
 
   const TITULOS = {
     dashboard:"Dashboard",pedidos:"Pedidos",os:"Ordens de Serviço",agendamento:"Agendamentos",
-    clientes:"Clientes",montadores:"Montadores",produtos:"Produtos",
+    clientes:"Clientes",montadores:"Montadores",produtos:"Produtos",fabricantes:"Fabricantes",
     rotas:"Rotas e Otimização",estoque:"Estoque",ponto:"Registro de Ponto (REP-P)",
     relatorios:"Relatórios e Filtros",comunicacao:"Comunicação — n8n",configuracoes:"Configurações",
   };
@@ -74,6 +75,7 @@ export default function App() {
     clientes:      <Clientes toast={showToast}/>,
     montadores:    <Montadores toast={showToast}/>,
     produtos:      <Produtos toast={showToast}/>,
+    fabricantes:   <Fabricantes toast={showToast}/>,
     rotas:         <Rotas/>,
     estoque:       <Estoque toast={showToast}/>,
     ponto:         <Ponto/>,

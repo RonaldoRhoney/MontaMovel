@@ -18,6 +18,8 @@ export const OSDetalhe = ({ osId, montador, session, onVoltar, toast }) => {
   const [assistindo, setAssistindo] = useState(false);
   const [motivo, setMotivo] = useState(MOTIVOS[0]);
   const [obs, setObs] = useState("");
+  const [fabricante, setFabricante] = useState("");
+  const [fabricantes, setFabricantes] = useState([]);
   const fileInputRef = useRef(null);
 
   const load = useCallback(async () => {
@@ -69,9 +71,22 @@ export const OSDetalhe = ({ osId, montador, session, onVoltar, toast }) => {
     await run("finalizar_sucesso", { lat, lng }, [blob]);
   };
 
+  const abrirAssistencia = async () => {
+    setAssistindo(true);
+    if (fabricantes.length === 0) {
+      const { data } = await supabase.from("fabricantes").select("id,nome").eq("ativo", true).order("nome");
+      setFabricantes(data || []);
+    }
+  };
+
   const confirmarAssistencia = async () => {
     const { lat, lng } = await getPosition();
-    await run("finalizar_assistencia", { motivo, observacoes: obs, lat, lng });
+    const existente = fabricantes.find(f => f.nome.toLowerCase() === fabricante.trim().toLowerCase());
+    await run("finalizar_assistencia", {
+      motivo, observacoes: obs, lat, lng,
+      fabricanteId: existente?.id || null,
+      fabricanteNome: existente ? null : fabricante.trim() || null,
+    });
     setAssistindo(false);
   };
 
@@ -134,7 +149,7 @@ export const OSDetalhe = ({ osId, montador, session, onVoltar, toast }) => {
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           <Btn variant="success" onClick={() => setAssinando(true)} disabled={busy || fotos.length === 0} full>✅ Concluir com Sucesso</Btn>
           {fotos.length === 0 && <div style={{ fontSize: 12, color: C.muted, textAlign: "center" }}>Tire ao menos 1 foto antes de concluir.</div>}
-          <Btn variant="ghost" onClick={() => setAssistindo(true)} disabled={busy} full>⚠️ Registrar Assistência</Btn>
+          <Btn variant="ghost" onClick={abrirAssistencia} disabled={busy} full>⚠️ Registrar Assistência</Btn>
         </div>
       )}
 
@@ -150,11 +165,20 @@ export const OSDetalhe = ({ osId, montador, session, onVoltar, toast }) => {
           <select value={motivo} onChange={e => setMotivo(e.target.value)} style={{ width: "100%", padding: "12px 14px", borderRadius: 10, border: `1px solid ${C.border}`, background: C.surface, color: C.text, fontSize: 14, marginBottom: 12 }}>
             {MOTIVOS.map(m => <option key={m} value={m}>{m}</option>)}
           </select>
+
+          <div style={{ fontSize: 11, color: C.muted, fontWeight: 700, marginBottom: 8 }}>FABRICANTE DO MÓVEL</div>
+          <input value={fabricante} onChange={e => setFabricante(e.target.value)} list="lista-fabricantes" placeholder="Ex: DJ Móveis"
+            style={{ width: "100%", boxSizing: "border-box", padding: "12px 14px", borderRadius: 10, border: `1px solid ${C.border}`, background: C.surface, color: C.text, fontSize: 14, marginBottom: 4 }} />
+          <datalist id="lista-fabricantes">
+            {fabricantes.map(f => <option key={f.id} value={f.nome} />)}
+          </datalist>
+          <div style={{ fontSize: 11, color: C.muted, marginBottom: 12 }}>Não achou na lista? Digite o nome — cadastra na hora.</div>
+
           <textarea value={obs} onChange={e => setObs(e.target.value)} placeholder="Detalhes do ocorrido..." rows={3}
             style={{ width: "100%", boxSizing: "border-box", padding: "12px 14px", borderRadius: 10, border: `1px solid ${C.border}`, background: C.surface, color: C.text, fontSize: 14, marginBottom: 12, resize: "vertical" }} />
           {fotos.length === 0 && <div style={{ fontSize: 12, color: C.orange, marginBottom: 12 }}>⚠ Recomendado: registre fotos como evidência antes de confirmar.</div>}
           <div style={{ display: "flex", gap: 10 }}>
-            <Btn variant="ghost" onClick={() => setAssistindo(false)}>Cancelar</Btn>
+            <Btn variant="ghost" onClick={() => { setAssistindo(false); setFabricante(""); }}>Cancelar</Btn>
             <div style={{ flex: 1 }}><Btn onClick={confirmarAssistencia} disabled={busy} full>Confirmar Assistência</Btn></div>
           </div>
         </Card>

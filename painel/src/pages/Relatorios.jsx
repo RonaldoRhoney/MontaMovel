@@ -1,8 +1,63 @@
 import { useState, useEffect } from "react";
+import { Factory } from "lucide-react";
 import { C, STATUS_DEF } from "../theme";
 import { supabase } from "../lib/supabase";
 import { useDB, useRT } from "../lib/hooks";
 import { Badge, Avatar, KpiCard, Sec, Pill, Btn, Inp, Sel, Txta, DTable, Modal, Toast, Empty } from "../components/ui";
+
+// Ranking de assistências por fabricante — a origem real do problema é o que
+// o montador aponta no local (ver montador-pwa/OSDetalhe), não o catálogo.
+const AssistenciasPorFabricante = () => {
+  const [periodo,setPeriodo] = useState("Este mês");
+  const [dados,setDados]     = useState([]);
+  const [loading,setLoading] = useState(false);
+
+  const buscar = async() => {
+    setLoading(true);
+    const hoje = new Date();
+    const ranges = {
+      "Esta semana": [new Date(new Date().setDate(hoje.getDate()-hoje.getDay()+1)).toISOString().split("T")[0], new Date().toISOString().split("T")[0]],
+      "Este mês":    [new Date(hoje.getFullYear(),hoje.getMonth(),1).toISOString().split("T")[0], new Date().toISOString().split("T")[0]],
+      "Este ano":    [new Date(hoje.getFullYear(),0,1).toISOString().split("T")[0], new Date().toISOString().split("T")[0]],
+    };
+    const [ini,fim] = ranges[periodo];
+    const {data} = await supabase.rpc("relatorio_assistencias_por_fabricante",{p_data_ini:ini,p_data_fim:fim});
+    setDados(data||[]);
+    setLoading(false);
+  };
+  useEffect(()=>{buscar();},[periodo]);
+
+  const max = Math.max(1,...dados.map(d=>Number(d.total)));
+
+  return (
+    <div className="mm-animate-in" style={{background:C.gradSurface,border:`1px solid ${C.border}`,borderRadius:14,padding:20,marginBottom:22,boxShadow:C.shadowSm}}>
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:16,flexWrap:"wrap",gap:10}}>
+        <div style={{display:"flex",alignItems:"center",gap:8}}>
+          <span style={{width:28,height:28,borderRadius:8,background:C.accent+"1c",display:"flex",alignItems:"center",justifyContent:"center",color:C.accent}}><Factory size={14}/></span>
+          <span style={{fontSize:14,fontWeight:700,color:C.text}}>Assistências por Fabricante</span>
+        </div>
+        <div style={{display:"flex",gap:6}}>{["Esta semana","Este mês","Este ano"].map(p=><Pill key={p} label={p} active={periodo===p} onClick={()=>setPeriodo(p)}/>)}</div>
+      </div>
+      {loading&&<div className="mm-skeleton" style={{height:100,borderRadius:10}}/>}
+      {!loading&&dados.length===0&&<div style={{fontSize:13,color:C.muted,textAlign:"center",padding:"20px 0"}}>Nenhuma assistência registrada nesse período.</div>}
+      {!loading&&dados.length>0&&(
+        <div style={{display:"flex",flexDirection:"column",gap:10}}>
+          {dados.map(d=>(
+            <div key={d.fabricante_id||d.fabricante_nome}>
+              <div style={{display:"flex",justifyContent:"space-between",fontSize:12,marginBottom:4}}>
+                <span style={{color:C.text,fontWeight:600}}>{d.fabricante_nome}</span>
+                <span style={{color:C.muted,fontWeight:700}}>{d.total}</span>
+              </div>
+              <div style={{height:8,borderRadius:5,background:C.surface,overflow:"hidden"}}>
+                <div style={{width:`${(Number(d.total)/max)*100}%`,height:"100%",borderRadius:5,background:C.gradAccent,transition:"width 0.4s ease"}}/>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
 
 // RELATÓRIOS
 export const Relatorios = () => {
@@ -63,6 +118,7 @@ export const Relatorios = () => {
     <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(160px,1fr))",gap:12,marginBottom:22}}>
       {[["Total OS",res.length,C.blue,"📋"],["Concluídas",conc,C.green,"✅"],["Assistências",assis,C.accent,"⚠️"],["Canceladas",canc,C.muted,"🚫"],["Taxa Sucesso",res.length?Math.round(conc/res.length*100)+"%":"—",C.yellow,"📊"]].map(([l,v,c,i])=><KpiCard key={l} label={l} value={v} color={c} icon={i}/>)}
     </div>
+    <AssistenciasPorFabricante/>
     <Sec>Resultados ({res.length} OS)</Sec>
     <DTable loading={loading} cols={["OS","Cliente","Produto","Montador","Bairro","Data","Status"]}
       rows={res.slice(0,100).map(r=>({_raw:r,cells:[
