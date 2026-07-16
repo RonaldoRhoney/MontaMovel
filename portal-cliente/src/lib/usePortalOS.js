@@ -2,7 +2,10 @@ import { useCallback, useEffect, useState } from "react";
 import { supabase } from "./supabase";
 
 function getToken() {
-  return new URLSearchParams(window.location.search).get("t");
+  const t = new URLSearchParams(window.location.search).get("t");
+  // Em demo, não exige token na URL — qualquer chamada bate no mock de qualquer forma.
+  if (!t && import.meta.env.VITE_DEMO_MODE === "true") return "demo";
+  return t;
 }
 
 export function usePortalOS() {

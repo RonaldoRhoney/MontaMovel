@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { C } from "./theme";
 import { supabase } from "./lib/supabase";
 import { Login } from "./pages/Login";
+import { Cadastro } from "./pages/Cadastro";
 import { Sidebar } from "./components/Sidebar";
 import { Topbar } from "./components/Topbar";
 import { AgenteIA } from "./components/AgenteIA";
@@ -28,6 +29,8 @@ export default function App() {
   const [notifs,setNotifs]     = useState([]);
   const [toastState,setToast]  = useState(null);
   const [authLoading,setAuthLoading] = useState(true);
+  const [userLoading,setUserLoading] = useState(true);
+  const [tela,setTela]         = useState("login"); // "login" | "cadastro"
 
   useEffect(()=>{
     supabase.auth.getSession().then(({data:{session:s}})=>{ setSession(s); setAuthLoading(false); });
@@ -37,7 +40,9 @@ export default function App() {
 
   useEffect(()=>{
     if(!session) return setUser(null);
-    supabase.from("users").select("*").eq("id",session.user.id).single().then(({data})=>data&&setUser(data));
+    setUserLoading(true);
+    supabase.from("users").select("*").eq("id",session.user.id).single()
+      .then(({data})=>{ setUser(data||null); setUserLoading(false); });
   },[session]);
 
   useEffect(()=>{
@@ -83,7 +88,17 @@ export default function App() {
     </div>
   );
 
-  if(!session) return <Login onLogin={()=>{}}/>;
+  if(!session) {
+    return tela==="cadastro"
+      ? <Cadastro onConcluido={()=>window.location.reload()} onVoltarLogin={()=>setTela("login")}/>
+      : <Login onLogin={()=>{}} onCriarConta={()=>setTela("cadastro")}/>;
+  }
+
+  // Sessão válida mas sem linha em `users` ainda: signUp aconteceu, falta o
+  // passo 2 do cadastro (dados da empresa) — ex.: usuário recarregou no meio.
+  if(!userLoading && !user) {
+    return <Cadastro contaCriada onConcluido={()=>window.location.reload()} onVoltarLogin={()=>supabase.auth.signOut()}/>;
+  }
 
   return (
     <div style={{display:"flex",minHeight:"100vh",background:C.dark,fontFamily:"'Inter',-apple-system,sans-serif",color:C.text}}
