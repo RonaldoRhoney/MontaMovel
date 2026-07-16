@@ -48,16 +48,16 @@ export const Agendamento = ({toast}) => {
   return <div style={{padding:24}}>
     {modal&&<Modal title="Novo Agendamento" onClose={()=>setModal(false)} wide>
       <Sel label="Cliente" value={form.cliente_id} onChange={v=>setForm(f({cliente_id:v}))} required options={[{value:"",label:"Selecione..."},...clis.map(c=>({value:c.id,label:c.nome}))]}/>
-      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
+      <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(160px,1fr))",gap:12}}>
         <Sel label="Produto" value={form.produto_id} onChange={v=>setForm(f({produto_id:v}))} options={[{value:"",label:"Selecionar produto..."},...prods.map(p=>({value:p.id,label:p.nome}))]}/>
         <Sel label="Montador" value={form.montador_id} onChange={v=>setForm(f({montador_id:v}))} options={[{value:"",label:"A definir"},...monts.filter(m=>m.status!=="Inativo").map(m=>({value:m.id,label:m.nome}))]}/>
       </div>
-      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:12}}>
+      <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(120px,1fr))",gap:12}}>
         <Inp label="Data" value={form.data_agendada} onChange={v=>setForm(f({data_agendada:v}))} type="date" required/>
         <Inp label="Hora" value={form.hora_agendada} onChange={v=>setForm(f({hora_agendada:v}))} type="time" required/>
         <Sel label="Prioridade" value={form.prioridade} onChange={v=>setForm(f({prioridade:v}))} options={["Normal","Urgente"]}/>
       </div>
-      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
+      <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(160px,1fr))",gap:12}}>
         <Inp label="Bairro" value={form.bairro} onChange={v=>setForm(f({bairro:v}))}/>
         <Inp label="Cidade" value={form.cidade} onChange={v=>setForm(f({cidade:v}))}/>
       </div>
@@ -77,7 +77,7 @@ export const Agendamento = ({toast}) => {
       <Btn onClick={()=>setModal(true)}>+ Agendar</Btn>
     </div>
 
-    <div style={{display:"grid",gridTemplateColumns:"repeat(6,1fr)",gap:10,marginBottom:14}}>
+    <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(110px,1fr))",gap:10,marginBottom:14}}>
       {monts.slice(0,6).map(m=>{
         const cor=m.status==="Em Campo"?C.green:m.status==="Em Rota"?C.yellow:m.status==="Atrasado"?C.accent:C.muted;
         return <div key={m.id} style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:8,padding:"8px 10px",display:"flex",gap:7,alignItems:"center"}}>
@@ -88,6 +88,8 @@ export const Agendamento = ({toast}) => {
     </div>
 
     <div style={{background:C.card,borderRadius:12,border:`1px solid ${C.border}`,overflow:"hidden"}}>
+     <div style={{overflowX:"auto",WebkitOverflowScrolling:"touch"}}>
+      <div style={{minWidth:720}}>
       <div style={{display:"grid",gridTemplateColumns:"72px repeat(6,1fr)",borderBottom:`1px solid ${C.border}`}}>
         <div style={{padding:10,background:C.surface}}/>
         {dias.map(d=>{
@@ -117,6 +119,8 @@ export const Agendamento = ({toast}) => {
           })}
         </div>
       ))}
+      </div>
+     </div>
     </div>
   </div>;
 };

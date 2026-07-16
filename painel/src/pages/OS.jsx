@@ -97,7 +97,7 @@ export const OS = ({toast}) => {
         <Badge status={o.status}/>
         {o.prioridade==="Urgente"&&<span style={{fontSize:12,color:C.accent,fontWeight:700,background:C.accent+"18",padding:"3px 10px",borderRadius:20}}>🔴 Urgente</span>}
       </div>
-      <div style={{display:"grid",gridTemplateColumns:"2fr 1fr",gap:20}}>
+      <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(280px,1fr))",gap:20}}>
         <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:12,padding:22}}>
           <div style={{fontSize:14,fontWeight:700,color:C.text,marginBottom:16}}>Dados da OS</div>
           {[["Cliente",o.clientes?.nome],["Produto",o.produtos?.nome||o.produto_descricao],["Montador",o.montadores?.nome],["Endereço",`${o.bairro||"—"} · ${o.cidade||"—"}`],["Data / Hora",`${o.data_agendada} às ${o.hora_agendada?.slice(0,5)}`],["Prioridade",o.prioridade],o.motivo_assist&&["Motivo Assistência",o.motivo_assist]].filter(Boolean).map(([k,v])=>(
@@ -161,7 +161,7 @@ export const OS = ({toast}) => {
           <div style={{fontSize:12,color:C.muted,marginTop:2}}>{pedidoSel.clientes?.logradouro}{pedidoSel.clientes?.numero?`, ${pedidoSel.clientes.numero}`:""} — {pedidoSel.clientes?.bairro}, {pedidoSel.clientes?.cidade}</div>
         </div>
         <Sel label="Montador" value={form.montador_id} onChange={v=>setForm(f({montador_id:v}))} options={[{value:"",label:"A definir..."},...montadores.map(m=>({value:m.id,label:m.nome}))]}/>
-        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:12}}>
+        <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(120px,1fr))",gap:12}}>
           <Inp label="Data" value={form.data_agendada} onChange={v=>setForm(f({data_agendada:v}))} type="date" required/>
           <Inp label="Hora" value={form.hora_agendada} onChange={v=>setForm(f({hora_agendada:v}))} type="time" required/>
           <Sel label="Prioridade" value={form.prioridade} onChange={v=>setForm(f({prioridade:v}))} options={["Normal","Urgente"]}/>

@@ -45,7 +45,7 @@ export const Cadastro = ({ contaCriada = false, onConcluido, onVoltarLogin }) =>
 
   return (
     <div style={{ minHeight: "100vh", background: C.dark, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Inter',-apple-system,sans-serif" }}>
-      <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 16, padding: 40, width: 420, boxShadow: "0 8px 40px #00000088" }}>
+      <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 16, padding: "40px 28px", width: "min(92vw,420px)", boxSizing: "border-box", boxShadow: "0 8px 40px #00000088" }}>
         <div style={{ textAlign: "center", marginBottom: 28 }}>
           <div style={{ fontSize: 28, fontWeight: 900, color: C.text }}>Monta<span style={{ color: C.accent }}>Movel</span></div>
           <div style={{ fontSize: 13, color: C.muted, marginTop: 6 }}>{passo === 1 ? "Crie sua conta — 60 dias grátis" : "Agora, sobre sua empresa"}</div>
@@ -72,7 +72,7 @@ export const Cadastro = ({ contaCriada = false, onConcluido, onVoltarLogin }) =>
             <Inp label="Razão Social" value={empresa.razao_social} onChange={(v) => e({ razao_social: v })} required />
             <Inp label="CNPJ (opcional para MEI/começando)" value={empresa.cnpj} onChange={(v) => e({ cnpj: v })} />
             <Inp label="Telefone" value={empresa.telefone} onChange={(v) => e({ telefone: v })} />
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(160px,1fr))", gap: 12 }}>
               <Inp label="Cidade" value={empresa.cidade} onChange={(v) => e({ cidade: v })} />
               <Inp label="Estado" value={empresa.estado} onChange={(v) => e({ estado: v })} placeholder="PA" />
             </div>

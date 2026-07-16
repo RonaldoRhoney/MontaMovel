@@ -32,22 +32,22 @@ export const Clientes = ({toast}) => {
 
   return <div style={{padding:24}}>
     {modal&&<Modal title={sel?"Editar Cliente":"Novo Cliente"} onClose={()=>{setModal(false);setSel(null);}} wide>
-      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
+      <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(160px,1fr))",gap:12}}>
         <Inp label="Nome Completo" value={form.nome} onChange={v=>setForm(f({nome:v}))} required/>
         <Inp label="CPF (criptografado)" value={form.cpf_enc} onChange={v=>setForm(f({cpf_enc:v}))} placeholder="000.000.000-00"/>
       </div>
-      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
+      <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(160px,1fr))",gap:12}}>
         <Inp label="Telefone" value={form.telefone} onChange={v=>setForm(f({telefone:v}))} required/>
         <Inp label="WhatsApp" value={form.whatsapp} onChange={v=>setForm(f({whatsapp:v}))}/>
       </div>
       <Inp label="E-mail" value={form.email} onChange={v=>setForm(f({email:v}))} type="email"/>
       <div style={{fontSize:11,color:C.muted,fontWeight:700,marginBottom:10}}>ENDEREÇO</div>
-      <div style={{display:"grid",gridTemplateColumns:"2fr 1fr 1fr",gap:12}}>
+      <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(120px,1fr))",gap:12}}>
         <Inp label="Logradouro" value={form.logradouro} onChange={v=>setForm(f({logradouro:v}))}/>
         <Inp label="Número" value={form.numero} onChange={v=>setForm(f({numero:v}))}/>
         <Inp label="CEP" value={form.cep} onChange={v=>setForm(f({cep:v}))} placeholder="00000-000"/>
       </div>
-      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:12}}>
+      <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(120px,1fr))",gap:12}}>
         <Inp label="Bairro" value={form.bairro} onChange={v=>setForm(f({bairro:v}))}/>
         <Inp label="Cidade" value={form.cidade} onChange={v=>setForm(f({cidade:v}))}/>
         <Inp label="Estado" value={form.estado} onChange={v=>setForm(f({estado:v}))} placeholder="PA"/>

@@ -34,11 +34,11 @@ export const Produtos = ({toast}) => {
   return <div style={{padding:24}}>
     {modal&&<Modal title={sel?"Editar Produto":"Novo Produto"} onClose={()=>{setModal(false);setSel(null);}}>
       <Inp label="Nome do Produto / Móvel" value={form.nome} onChange={v=>setForm(f({nome:v}))} required placeholder="Ex: Guarda-Roupa 6 Portas"/>
-      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
+      <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(160px,1fr))",gap:12}}>
         <Inp label="SKU / Código" value={form.sku} onChange={v=>setForm(f({sku:v}))} placeholder="GR-001"/>
         <Sel label="Categoria" value={form.categoria} onChange={v=>setForm(f({categoria:v}))} options={["guarda-roupa","cozinha","escritorio","sala","quarto","banheiro","varanda","externo","outro"]} required/>
       </div>
-      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
+      <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(160px,1fr))",gap:12}}>
         <Sel label="Complexidade" value={form.complexidade} onChange={v=>setForm(f({complexidade:v}))} options={["simples","media","complexa","especial"]}/>
         <Inp label="Tempo Estimado (min)" value={form.tempo_estimado} onChange={v=>setForm(f({tempo_estimado:v}))} type="number" placeholder="90"/>
       </div>

@@ -44,16 +44,16 @@ export const Estoque = ({toast}) => {
   return <div style={{padding:24}}>
     {modal&&<Modal title={sel?"Editar Item":"Novo Item de Estoque"} onClose={()=>{setModal(false);setSel(null);}}>
       <Inp label="Nome do Item" value={form.nome} onChange={v=>setForm(f({nome:v}))} required/>
-      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
+      <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(160px,1fr))",gap:12}}>
         <Inp label="SKU / Código" value={form.sku} onChange={v=>setForm(f({sku:v}))}/>
         <Sel label="Categoria" value={form.categoria} onChange={v=>setForm(f({categoria:v}))} options={["Fixação","Ferragem","Suporte","Ferramenta","Consumível","Outro"]}/>
       </div>
-      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:12}}>
+      <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(120px,1fr))",gap:12}}>
         <Inp label="Qtd. Atual" value={form.qtd_atual.toString()} onChange={v=>setForm(f({qtd_atual:v}))} type="number"/>
         <Inp label="Qtd. Mínima" value={form.qtd_minima.toString()} onChange={v=>setForm(f({qtd_minima:v}))} type="number"/>
         <Inp label="Unidade" value={form.unidade} onChange={v=>setForm(f({unidade:v}))} placeholder="unid, kg..."/>
       </div>
-      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
+      <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(160px,1fr))",gap:12}}>
         <Inp label="Fornecedor" value={form.fornecedor} onChange={v=>setForm(f({fornecedor:v}))}/>
         <Inp label="Preço Unit. (R$)" value={form.preco_unitario} onChange={v=>setForm(f({preco_unitario:v}))} type="number"/>
       </div>
@@ -65,7 +65,7 @@ export const Estoque = ({toast}) => {
     </Modal>}
     {modalMov&&<Modal title="Registrar Movimentação" onClose={()=>setModalMov(false)}>
       <Sel label="Item" value={mov.estoque_id} onChange={v=>setMov({...mov,estoque_id:v})} required options={[{value:"",label:"Selecione..."},...data.map(e=>({value:e.id,label:e.nome}))]}/>
-      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
+      <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(160px,1fr))",gap:12}}>
         <Sel label="Tipo" value={mov.tipo} onChange={v=>setMov({...mov,tipo:v})} options={["entrada","saida","ajuste","perda"]}/>
         <Inp label="Quantidade" value={mov.quantidade.toString()} onChange={v=>setMov({...mov,quantidade:v})} type="number"/>
       </div>
@@ -75,7 +75,7 @@ export const Estoque = ({toast}) => {
         <Btn onClick={regMov} disabled={saving}>{saving?"Salvando...":"Confirmar"}</Btn>
       </div>
     </Modal>}
-    <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:14,marginBottom:22}}>
+    <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(180px,1fr))",gap:14,marginBottom:22}}>
       <KpiCard label="Total de Itens" value={data.length} color={C.blue} icon="📦"/>
       <KpiCard label="Críticos" value={criticos} sub="Abaixo do mínimo" color={C.accent} icon="⚠️"/>
       <KpiCard label="Em Alerta" value={alertas} sub="Próximo do mínimo" color={C.yellow} icon="🔔"/>

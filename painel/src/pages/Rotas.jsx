@@ -21,7 +21,7 @@ export const Rotas = () => {
       </div>
       <Btn>⚡ Otimizar Rotas</Btn>
     </div>
-    <div style={{display:"grid",gridTemplateColumns:"1fr 1.6fr",gap:20}}>
+    <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(300px,1fr))",gap:20}}>
       <div>
         <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:12,padding:20,marginBottom:14}}>
           <div style={{fontSize:13,fontWeight:700,color:C.text}}>{sel?.nome||"—"}</div>

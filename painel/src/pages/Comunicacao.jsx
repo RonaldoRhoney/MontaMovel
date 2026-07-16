@@ -26,7 +26,7 @@ export const Comunicacao = () => {
     {n:"Lembrete Confirmação Pendente",t:"WhatsApp",d:22,e:"96.3%",s:"Ativo"},
   ];
   return <div style={{padding:24}}>
-    <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:14,marginBottom:22}}>
+    <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(180px,1fr))",gap:14,marginBottom:22}}>
       <KpiCard label="Mensagens (mês)" value={total||"—"} sub="WhatsApp + E-mail" color={C.green} icon="📤"/>
       <KpiCard label="Taxa de Entrega" value={total?taxa+"%":"—"} sub="Meta: 95%" color={C.blue} icon="✅"/>
       <KpiCard label="Respostas Bot" value="—" sub="n8n automático" color={C.purple} icon="💬"/>
@@ -35,7 +35,7 @@ export const Comunicacao = () => {
       {["fluxos","log","templates"].map(t=><Pill key={t} label={t==="fluxos"?"Fluxos n8n":t==="log"?"Log de Envios":"Templates"} active={tab===t} onClick={()=>setTab(t)}/>)}
       <div style={{marginLeft:"auto"}}><Btn>+ Novo Fluxo</Btn></div>
     </div>
-    {tab==="fluxos"&&<div style={{display:"grid",gridTemplateColumns:"repeat(2,1fr)",gap:12}}>
+    {tab==="fluxos"&&<div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(260px,1fr))",gap:12}}>
       {fluxos.map((f,i)=><div key={i} style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:10,padding:"14px 16px",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
         <div><div style={{fontSize:13,color:C.text,fontWeight:600}}>{f.n}</div><div style={{fontSize:11,color:C.muted,marginTop:3}}>{f.t} · {f.d} disparos · {f.e} entregues</div></div>
         <div style={{display:"flex",gap:8,alignItems:"center"}}><Badge status={f.s}/><Btn variant="ghost" small>Editar</Btn></div>
@@ -51,7 +51,7 @@ export const Comunicacao = () => {
         <span style={{fontSize:12,color:C.muted}}>{new Date(l.created_at).toLocaleString("pt-BR")}</span>,
       ]}))}
     />}
-    {tab==="templates"&&<div style={{display:"grid",gridTemplateColumns:"repeat(2,1fr)",gap:14}}>
+    {tab==="templates"&&<div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(260px,1fr))",gap:14}}>
       {[
         {n:"Confirmação de Agendamento",p:"Olá {nome}! Montagem agendada para {data} às {hora}. Confirme respondendo SIM. 📦"},
         {n:"Montador em Rota",p:"Oi {nome}! {montador} está a caminho. ETA: {eta} min. 🚚"},

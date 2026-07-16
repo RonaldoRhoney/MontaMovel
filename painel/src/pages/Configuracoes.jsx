@@ -67,7 +67,7 @@ export const Configuracoes = ({user,toast,onLogout}) => {
   ];
 
   return <div style={{padding:24}}>
-    <div style={{display:"grid",gridTemplateColumns:"220px 1fr",gap:22}}>
+    <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(200px,1fr))",gap:22}}>
       <div style={{display:"flex",flexDirection:"column",gap:3}}>
         {SECS.map(s=><button key={s.id} onClick={()=>setSec(s.id)}
           style={{padding:"9px 13px",borderRadius:8,border:"none",background:sec===s.id?C.accent+"18":"transparent",color:sec===s.id?C.accent:C.muted,textAlign:"left",cursor:"pointer",fontSize:13,fontWeight:sec===s.id?700:500}}>{s.label}</button>)}
@@ -86,7 +86,7 @@ export const Configuracoes = ({user,toast,onLogout}) => {
           <Inp label="CNPJ" value={tenant.cnpj||""} onChange={v=>setTenant({...tenant,cnpj:v})}/>
           <Inp label="E-mail Comercial" value={tenant.email||""} onChange={v=>setTenant({...tenant,email:v})} type="email"/>
           <Inp label="Telefone" value={tenant.telefone||""} onChange={v=>setTenant({...tenant,telefone:v})}/>
-          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
+          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(160px,1fr))",gap:12}}>
             <Inp label="Cidade Principal" value={tenant.cidade||""} onChange={v=>setTenant({...tenant,cidade:v})}/>
             <Inp label="Estado" value={tenant.estado||""} onChange={v=>setTenant({...tenant,estado:v})} placeholder="PA"/>
           </div>

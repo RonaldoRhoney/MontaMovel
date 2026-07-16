@@ -26,6 +26,7 @@ export default function App() {
   const [user,setUser]         = useState(null);
   const [ativo,setAtivo]       = useState("dashboard");
   const [col,setCol]           = useState(false);
+  const [mobileNavOpen,setMobileNavOpen] = useState(false);
   const [notifOpen,setNotifOpen] = useState(false);
   const [notifs,setNotifs]     = useState([]);
   const [toastState,setToast]  = useState(null);
@@ -105,10 +106,12 @@ export default function App() {
   return (
     <div style={{display:"flex",minHeight:"100vh",background:C.dark,fontFamily:"'Inter',-apple-system,sans-serif",color:C.text}}
       onClick={()=>notifOpen&&setNotifOpen(false)}>
-      <Sidebar ativo={ativo} setAtivo={setAtivo} col={col} setCol={setCol} user={user}/>
+      <Sidebar ativo={ativo} setAtivo={setAtivo} col={col} setCol={setCol} user={user}
+        mobileOpen={mobileNavOpen} onCloseMobile={()=>setMobileNavOpen(false)}/>
       <div style={{flex:1,display:"flex",flexDirection:"column",minWidth:0,maxHeight:"100vh",overflowY:"auto"}}>
-        <Topbar titulo={TITULOS[ativo]} notifOpen={notifOpen} setNotifOpen={setNotifOpen} notifs={notifs} onNovaOS={()=>setAtivo("os")}/>
-        <main style={{flex:1}}>{VIEWS[ativo]}</main>
+        <Topbar titulo={TITULOS[ativo]} notifOpen={notifOpen} setNotifOpen={setNotifOpen} notifs={notifs}
+          onNovaOS={()=>setAtivo("os")} onMenuClick={()=>setMobileNavOpen(true)}/>
+        <main style={{flex:1,minWidth:0}}>{VIEWS[ativo]}</main>
       </div>
       <AgenteIA modulo={ativo} ctx={`Usuário: ${user?.nome||"—"} (${user?.role||"—"})`}/>
       {toastState&&<Toast msg={toastState.msg} type={toastState.type} onClose={()=>setToast(null)}/>}

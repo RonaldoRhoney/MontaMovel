@@ -38,7 +38,7 @@ export const Relatorios = () => {
   return <div style={{padding:24}}>
     <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:12,padding:18,marginBottom:20}}>
       <div style={{fontSize:13,fontWeight:700,color:C.text,marginBottom:14}}>Central de Filtros</div>
-      <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:14}}>
+      <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(180px,1fr))",gap:14}}>
         <div>
           <div style={{fontSize:11,color:C.muted,fontWeight:700,marginBottom:8}}>PERÍODO</div>
           <div style={{display:"flex",flexWrap:"wrap",gap:5}}>{["Hoje","Esta semana","Este mês","Mês passado","Últimos 90 dias"].map(p=><Pill key={p} label={p} active={periodo===p} onClick={()=>setPeriodo(p)}/>)}</div>
@@ -47,7 +47,7 @@ export const Relatorios = () => {
         <Sel label="Montador" value={montId} onChange={setMontId} options={[{value:"",label:"Todos"},...monts.map(m=>({value:m.id,label:m.nome}))]}/>
         <div>
           <div style={{fontSize:11,color:C.muted,fontWeight:700,marginBottom:8}}>INTERVALO CUSTOMIZADO</div>
-          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>
+          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(160px,1fr))",gap:8}}>
             <Inp label="De" value={dataIni} onChange={setDataIni} type="date"/>
             <Inp label="Até" value={dataFim} onChange={setDataFim} type="date"/>
           </div>
@@ -60,7 +60,7 @@ export const Relatorios = () => {
         <Btn variant="ghost">📧 Agendar Envio</Btn>
       </div>
     </div>
-    <div style={{display:"grid",gridTemplateColumns:"repeat(5,1fr)",gap:12,marginBottom:22}}>
+    <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(160px,1fr))",gap:12,marginBottom:22}}>
       {[["Total OS",res.length,C.blue,"📋"],["Concluídas",conc,C.green,"✅"],["Assistências",assis,C.accent,"⚠️"],["Canceladas",canc,C.muted,"🚫"],["Taxa Sucesso",res.length?Math.round(conc/res.length*100)+"%":"—",C.yellow,"📊"]].map(([l,v,c,i])=><KpiCard key={l} label={l} value={v} color={c} icon={i}/>)}
     </div>
     <Sec>Resultados ({res.length} OS)</Sec>

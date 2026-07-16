@@ -31,15 +31,15 @@ export const Montadores = ({toast}) => {
 
   const MForm = () => <Modal title={sel?"Editar Montador":"Cadastrar Montador"} onClose={()=>{setModal(false);setSel(null);}}>
     <Inp label="Nome Completo" value={form.nome} onChange={v=>setForm(f({nome:v}))} required/>
-    <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
+    <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(160px,1fr))",gap:12}}>
       <Inp label="Telefone" value={form.telefone} onChange={v=>setForm(f({telefone:v}))} placeholder="(91) 99000-0000" required/>
       <Inp label="CPF (criptografado)" value={form.cpf_enc} onChange={v=>setForm(f({cpf_enc:v}))} placeholder="000.000.000-00"/>
     </div>
-    <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
+    <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(160px,1fr))",gap:12}}>
       <Sel label="Tipo Contrato" value={form.tipo_contrato} onChange={v=>setForm(f({tipo_contrato:v}))} options={["CLT","PJ","Autonomo"]} required/>
       <Inp label="Data Admissão" value={form.data_admissao} onChange={v=>setForm(f({data_admissao:v}))} type="date"/>
     </div>
-    <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:12}}>
+    <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(120px,1fr))",gap:12}}>
       <Inp label="Bairro" value={form.bairro} onChange={v=>setForm(f({bairro:v}))}/>
       <Inp label="Cidade" value={form.cidade} onChange={v=>setForm(f({cidade:v}))}/>
       <Inp label="Estado" value={form.estado} onChange={v=>setForm(f({estado:v}))} placeholder="PA"/>
@@ -56,7 +56,7 @@ export const Montadores = ({toast}) => {
   if(detalhe) return <div style={{padding:24}}>
     {modal&&<MForm/>}
     <Btn variant="ghost" onClick={()=>setDetalhe(null)}>← Voltar</Btn>
-    <div style={{display:"grid",gridTemplateColumns:"1fr 2fr",gap:20,marginTop:18}}>
+    <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(280px,1fr))",gap:20,marginTop:18}}>
       <div style={{display:"flex",flexDirection:"column",gap:14}}>
         <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:12,padding:22,textAlign:"center"}}>
           <Avatar i={detalhe.nome.substring(0,2).toUpperCase()} size={72} color={C.accent}/>
@@ -65,7 +65,7 @@ export const Montadores = ({toast}) => {
           <div style={{fontSize:12,color:C.muted}}>{detalhe.telefone}</div>
           <div style={{fontSize:11,color:C.muted,marginTop:2}}>{detalhe.tipo_contrato} · desde {detalhe.data_admissao||"—"}</div>
           <span style={{display:"inline-block",marginTop:10,fontSize:10,color:C.green,fontWeight:700,background:C.green+"18",padding:"2px 10px",borderRadius:20}}>{detalhe.status}</span>
-          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginTop:18}}>
+          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(160px,1fr))",gap:10,marginTop:18}}>
             {[["NPS",detalhe.nps_medio||"—",C.yellow],["OS Total",detalhe.total_os||0,C.blue]].map(([k,v,c])=>(
               <div key={k} style={{background:C.surface,borderRadius:8,padding:10}}><div style={{fontSize:20,fontWeight:800,color:c}}>{v}</div><div style={{fontSize:10,color:C.muted}}>{k}</div></div>
             ))}
@@ -99,7 +99,7 @@ export const Montadores = ({toast}) => {
     </div>
     {loading&&<div style={{textAlign:"center",color:C.muted,padding:32}}>Carregando...</div>}
     {!loading&&data.length===0&&<Empty icon="👷" msg="Nenhum montador cadastrado." action="Cadastrar" onAction={()=>setModal(true)}/>}
-    <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:14}}>
+    <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(260px,1fr))",gap:14}}>
       {data.map(m=>{
         const cor=m.status==="Atrasado"?C.accent:m.status==="Em Campo"?C.green:m.status==="Em Rota"?C.yellow:C.muted;
         return <div key={m.id} style={{background:C.card,border:`1px solid ${m.status==="Atrasado"?C.accent+"55":C.border}`,borderRadius:12,padding:18,cursor:"pointer"}} onClick={()=>setDetalhe(m)}>
@@ -112,7 +112,7 @@ export const Montadores = ({toast}) => {
               <span style={{display:"inline-block",marginTop:4,fontSize:10,color:cor,fontWeight:700,background:cor+"18",padding:"2px 9px",borderRadius:20}}>{m.status}</span>
             </div>
           </div>
-          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:8}}>
+          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(120px,1fr))",gap:8}}>
             {[["OS Total",m.total_os||0],["NPS",m.nps_medio||"—"],[m.tipo_contrato,m.data_admissao?.split("-")[0]||"—"]].map(([k,v])=>(
               <div key={k} style={{background:C.surface,borderRadius:8,padding:"8px 10px",textAlign:"center"}}>
                 <div style={{fontSize:14,fontWeight:700,color:C.text}}>{v}</div>

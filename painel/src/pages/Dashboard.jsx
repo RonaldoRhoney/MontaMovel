@@ -37,10 +37,10 @@ export const Dashboard = () => {
   ];
 
   return <div style={{padding:24}}>
-    <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:14,marginBottom:14}}>
+    <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(180px,1fr))",gap:14,marginBottom:14}}>
       {kpis.slice(0,4).map(k=><KpiCard key={k.label} {...k}/>)}
     </div>
-    <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:14,marginBottom:22}}>
+    <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(180px,1fr))",gap:14,marginBottom:22}}>
       {kpis.slice(4).map(k=><KpiCard key={k.label} {...k}/>)}
     </div>
     {(resumo.atrasadas>0||resumo.assistencias>0||resumo.estoque_critico>0)&&(
@@ -68,7 +68,7 @@ export const Dashboard = () => {
       ]}))}
     />
     <Sec>Montadores Hoje</Sec>
-    <div style={{display:"grid",gridTemplateColumns:"repeat(5,1fr)",gap:12}}>
+    <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(140px,1fr))",gap:12}}>
       {loading&&<div style={{gridColumn:"1/-1",textAlign:"center",color:C.muted,padding:20}}>Carregando...</div>}
       {monts.map(m=>{
         const cor=m.status==="Atrasado"?C.accent:m.status==="Em Campo"?C.green:m.status==="Em Rota"?C.yellow:C.muted;

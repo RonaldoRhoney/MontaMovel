@@ -69,29 +69,31 @@ export const DTable = ({cols,rows,onRowClick,loading}) => (
   <div style={{background:C.card,borderRadius:12,border:`1px solid ${C.border}`,overflow:"hidden"}}>
     {loading&&<div style={{padding:32,textAlign:"center",color:C.muted,fontSize:13}}>Carregando...</div>}
     {!loading&&(
-      <table style={{width:"100%",borderCollapse:"collapse"}}>
-        <thead><tr style={{background:C.surface}}>
-          {cols.map(c=><th key={c} style={{padding:"11px 14px",textAlign:"left",fontSize:11,color:C.muted,fontWeight:700,borderBottom:`1px solid ${C.border}`}}>{c}</th>)}
-        </tr></thead>
-        <tbody>
-          {rows.map((r,i)=>(
-            <tr key={i} onClick={()=>onRowClick&&onRowClick(r._raw)} style={{background:i%2===0?"transparent":C.surface+"50",cursor:onRowClick?"pointer":"default"}}>
-              {r.cells.map((c,j)=><td key={j} style={{padding:"11px 14px",fontSize:13,color:C.text}}>{c}</td>)}
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <div style={{overflowX:"auto",WebkitOverflowScrolling:"touch"}}>
+        <table style={{width:"100%",minWidth:cols.length*110,borderCollapse:"collapse"}}>
+          <thead><tr style={{background:C.surface}}>
+            {cols.map(c=><th key={c} style={{padding:"11px 14px",textAlign:"left",fontSize:11,color:C.muted,fontWeight:700,borderBottom:`1px solid ${C.border}`,whiteSpace:"nowrap"}}>{c}</th>)}
+          </tr></thead>
+          <tbody>
+            {rows.map((r,i)=>(
+              <tr key={i} onClick={()=>onRowClick&&onRowClick(r._raw)} style={{background:i%2===0?"transparent":C.surface+"50",cursor:onRowClick?"pointer":"default"}}>
+                {r.cells.map((c,j)=><td key={j} style={{padding:"11px 14px",fontSize:13,color:C.text}}>{c}</td>)}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     )}
     {!loading&&rows.length===0&&<div style={{padding:32,textAlign:"center",color:C.muted,fontSize:13}}>Nenhum registro encontrado.</div>}
   </div>
 );
 
 export const Modal = ({title,onClose,children,wide}) => (
-  <div style={{position:"fixed",inset:0,background:"#00000088",zIndex:200,display:"flex",alignItems:"center",justifyContent:"center"}} onClick={onClose}>
-    <div onClick={e=>e.stopPropagation()} style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:14,padding:28,width:wide?720:520,maxHeight:"90vh",overflowY:"auto",boxShadow:"0 16px 48px #00000099"}}>
-      <div style={{display:"flex",justifyContent:"space-between",marginBottom:22}}>
+  <div style={{position:"fixed",inset:0,background:"#00000088",zIndex:200,display:"flex",alignItems:"center",justifyContent:"center",padding:16,boxSizing:"border-box"}} onClick={onClose}>
+    <div onClick={e=>e.stopPropagation()} style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:14,padding:24,width:wide?"min(92vw,720px)":"min(92vw,520px)",maxHeight:"90vh",overflowY:"auto",boxShadow:"0 16px 48px #00000099",boxSizing:"border-box"}}>
+      <div style={{display:"flex",justifyContent:"space-between",marginBottom:22,gap:12}}>
         <span style={{fontSize:16,fontWeight:700,color:C.text}}>{title}</span>
-        <button onClick={onClose} style={{background:"none",border:"none",color:C.muted,fontSize:18,cursor:"pointer"}}>✕</button>
+        <button onClick={onClose} style={{background:"none",border:"none",color:C.muted,fontSize:18,cursor:"pointer",flexShrink:0}}>✕</button>
       </div>
       {children}
     </div>
@@ -101,7 +103,7 @@ export const Modal = ({title,onClose,children,wide}) => (
 export const Toast = ({msg,type,onClose}) => {
   useEffect(()=>{const t=setTimeout(onClose,3500);return()=>clearTimeout(t);},[]);
   const col={success:C.green,error:C.accent,info:C.blue}[type]||C.blue;
-  return <div style={{position:"fixed",bottom:90,left:"50%",transform:"translateX(-50%)",background:C.card,border:`1px solid ${col}`,borderRadius:10,padding:"12px 20px",color:C.text,fontSize:13,fontWeight:600,boxShadow:"0 4px 20px #00000066",zIndex:300,display:"flex",alignItems:"center",gap:10}}>
+  return <div style={{position:"fixed",bottom:90,left:"50%",transform:"translateX(-50%)",width:"min(92vw,420px)",boxSizing:"border-box",background:C.card,border:`1px solid ${col}`,borderRadius:10,padding:"12px 20px",color:C.text,fontSize:13,fontWeight:600,boxShadow:"0 4px 20px #00000066",zIndex:300,display:"flex",alignItems:"center",gap:10}}>
     <span style={{color:col}}>{type==="success"?"✅":type==="error"?"❌":"ℹ️"}</span>{msg}
   </div>;
 };

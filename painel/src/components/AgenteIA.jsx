@@ -47,7 +47,7 @@ export const AgenteIA = ({modulo,ctx=""}) => {
       style={{position:"fixed",bottom:24,right:24,zIndex:100,width:52,height:52,borderRadius:"50%",background:C.accent,border:"none",cursor:"pointer",fontSize:22,boxShadow:`0 4px 20px ${C.accent}66`,display:"flex",alignItems:"center",justifyContent:"center"}}>
       {ag.emoji}
     </button>
-    {open&&<div style={{position:"fixed",bottom:86,right:24,zIndex:100,width:360,background:C.card,border:`1px solid ${C.border}`,borderRadius:16,boxShadow:"0 8px 40px #00000088",display:"flex",flexDirection:"column",overflow:"hidden"}}>
+    {open&&<div style={{position:"fixed",bottom:86,right:16,left:16,marginLeft:"auto",zIndex:100,width:"min(calc(100vw - 32px),360px)",background:C.card,border:`1px solid ${C.border}`,borderRadius:16,boxShadow:"0 8px 40px #00000088",display:"flex",flexDirection:"column",overflow:"hidden"}}>
       <div style={{padding:"13px 16px",background:C.surface,borderBottom:`1px solid ${C.border}`,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
         <div><div style={{fontSize:13,fontWeight:700,color:C.text}}>{ag.emoji} {ag.nome}</div><div style={{fontSize:11,color:C.muted}}>{ag.desc}</div></div>
         <button onClick={()=>setOpen(false)} style={{background:"none",border:"none",color:C.muted,cursor:"pointer",fontSize:16}}>✕</button>
