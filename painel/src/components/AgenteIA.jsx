@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { C } from "../theme";
+import { supabase } from "../lib/supabase";
 
 const AGENTES = {
   dashboard:    {emoji:"📊",nome:"Agente Dashboard",   desc:"KPIs, gargalos e ações imediatas",      sys:"Você é o Agente Dashboard do MontaMovel. Analise os dados operacionais (OS, montadores, NPS, assistências) e sugira ações concretas em português."},
@@ -16,30 +17,50 @@ const AGENTES = {
   configuracoes:{emoji:"⚙️",nome:"Agente Config",      desc:"LGPD, segurança e integrações",          sys:"Você é o Agente de Configurações, especialista em LGPD, segurança SaaS e integrações. Oriente o administrador. Responda em português."},
 };
 
+const CONSENT_KEY = "montamovel-ai-consent-v1";
+
 export const AgenteIA = ({modulo,ctx=""}) => {
   const [open,setOpen]       = useState(false);
   const [msgs,setMsgs]       = useState([]);
   const [input,setInput]     = useState("");
   const [loading,setLoading] = useState(false);
+  const [consent,setConsent] = useState(()=>typeof window!=="undefined"&&localStorage.getItem(CONSENT_KEY)==="granted");
+  const [showConsent,setShowConsent] = useState(false);
   const endRef = useRef(null);
   const ag = AGENTES[modulo]||AGENTES.dashboard;
   useEffect(()=>{endRef.current?.scrollIntoView({behavior:"smooth"});},[msgs]);
 
-  const send = async() => {
-    if(!input.trim()||loading) return;
-    const txt=input.trim(); setInput(""); setLoading(true);
+  const doSend = async(txt) => {
+    setInput(""); setLoading(true);
     setMsgs(p=>[...p,{role:"user",content:txt}]);
     try {
-      const res = await fetch("https://api.anthropic.com/v1/messages",{
-        method:"POST",headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({model:"claude-sonnet-4-6",max_tokens:1000,
+      const {data:{session}} = await supabase.auth.getSession();
+      const res = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-agent`,{
+        method:"POST",
+        headers:{"Content-Type":"application/json",Authorization:`Bearer ${session?.access_token||""}`},
+        body:JSON.stringify({
           system:ag.sys+(ctx?"\n\nContexto: "+ctx:""),
-          messages:[...msgs,{role:"user",content:txt}].map(m=>({role:m.role,content:m.content}))})
+          messages:[...msgs,{role:"user",content:txt}].map(m=>({role:m.role,content:m.content})),
+        }),
       });
+      if(!res.ok) throw new Error(await res.text());
       const d=await res.json();
-      setMsgs(p=>[...p,{role:"assistant",content:d.content?.[0]?.text||"Sem resposta."}]);
+      setMsgs(p=>[...p,{role:"assistant",content:d.reply||"Sem resposta."}]);
     } catch{ setMsgs(p=>[...p,{role:"assistant",content:"Erro de conexão."}]); }
     setLoading(false);
+  };
+
+  const send = () => {
+    if(!input.trim()||loading) return;
+    const txt=input.trim();
+    if(!consent){ setShowConsent(true); return; }
+    doSend(txt);
+  };
+
+  const acceptConsent = () => {
+    localStorage.setItem(CONSENT_KEY,"granted");
+    setConsent(true); setShowConsent(false);
+    if(input.trim()) doSend(input.trim());
   };
 
   return <>
@@ -64,6 +85,18 @@ export const AgenteIA = ({modulo,ctx=""}) => {
         <input value={input} onChange={e=>setInput(e.target.value)} onKeyDown={e=>e.key==="Enter"&&send()} placeholder="Pergunte algo..."
           style={{flex:1,padding:"8px 12px",borderRadius:8,border:`1px solid ${C.border}`,background:C.surface,color:C.text,fontSize:13,outline:"none"}}/>
         <button onClick={send} disabled={loading} style={{padding:"8px 14px",borderRadius:8,border:"none",background:C.accent,color:C.white,cursor:"pointer",fontSize:13,fontWeight:700,opacity:loading?0.6:1}}>↑</button>
+      </div>
+    </div>}
+    {showConsent&&<div style={{position:"fixed",inset:0,background:"#0A0B0FBB",backdropFilter:"blur(6px)",zIndex:200,display:"flex",alignItems:"center",justifyContent:"center",padding:16}} onClick={()=>setShowConsent(false)}>
+      <div onClick={e=>e.stopPropagation()} style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:16,padding:22,width:"min(92vw,420px)",boxShadow:"0 8px 40px #00000088"}}>
+        <div style={{fontSize:15,fontWeight:700,color:C.text,marginBottom:10}}>Este recurso usa Inteligência Artificial</div>
+        <div style={{fontSize:13,color:C.muted,lineHeight:1.6,marginBottom:16}}>
+          Ao enviar uma mensagem, o texto digitado e o contexto do módulo atual (ex.: nome e papel do usuário) são processados por um provedor de IA de terceiro (Anthropic/Claude) para gerar a resposta. Evite colar CPF ou dados sensíveis de clientes na conversa — envie apenas o necessário.
+        </div>
+        <div style={{display:"flex",gap:10,justifyContent:"flex-end"}}>
+          <button onClick={()=>setShowConsent(false)} style={{padding:"8px 14px",borderRadius:8,border:`1px solid ${C.border}`,background:"none",color:C.muted,cursor:"pointer",fontSize:13}}>Cancelar</button>
+          <button onClick={acceptConsent} style={{padding:"8px 14px",borderRadius:8,border:"none",background:C.accent,color:C.white,cursor:"pointer",fontSize:13,fontWeight:700}}>Entendi, continuar</button>
+        </div>
       </div>
     </div>}
   </>;

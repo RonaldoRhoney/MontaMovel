@@ -3,6 +3,7 @@ import { C, STATUS_DEF } from "../theme";
 import { supabase } from "../lib/supabase";
 import { useDB, useRT } from "../lib/hooks";
 import { Badge, Avatar, KpiCard, Sec, Pill, Btn, Inp, Sel, Txta, DTable, Modal, Toast, Empty } from "../components/ui";
+import { PoliticaPrivacidade } from "../components/PoliticaPrivacidade";
 
 // CONFIGURAÇÕES
 const ROLE_LABEL = {admin:"Administrador",gestor:"Gestor",atendente:"Atendente",montador:"Montador"};
@@ -17,6 +18,23 @@ export const Configuracoes = ({user,toast,onLogout}) => {
   const [convidando,setConvidando] = useState(false);
   const blankConvite = {nome:"",email:"",telefone:"",role:"atendente"};
   const [convite,setConvite]       = useState(blankConvite);
+  const [modalPrivacidade,setModalPrivacidade] = useState(false);
+  const [modalExcluir,setModalExcluir] = useState(false);
+  const [excluindo,setExcluindo] = useState(false);
+
+  const excluirMinhaConta = async() => {
+    setExcluindo(true);
+    const {data:{session}} = await supabase.auth.getSession();
+    try{
+      const res = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/delete-account`,{
+        method:"POST",
+        headers:{"Content-Type":"application/json",Authorization:`Bearer ${session?.access_token}`},
+      });
+      if(!res.ok) throw new Error(await res.text());
+      await supabase.auth.signOut();
+      onLogout();
+    } catch(e){ toast("Erro ao excluir conta: "+e.message,"error"); setExcluindo(false); }
+  };
 
   useEffect(()=>{
     if(!user?.tenant_id) return;
@@ -120,11 +138,31 @@ export const Configuracoes = ({user,toast,onLogout}) => {
             <span style={{fontSize:12,color:C.muted}}>{k}</span>
             <span style={{fontSize:12,color:C.text,fontWeight:600}}>{ic} {v}</span>
           </div>)}
-          <div style={{marginTop:18,display:"flex",gap:10}}>
-            <Btn variant="ghost">Política de Privacidade</Btn>
+          <div style={{marginTop:18,display:"flex",gap:10,flexWrap:"wrap"}}>
+            <Btn variant="ghost" onClick={()=>setModalPrivacidade(true)}>Política de Privacidade</Btn>
             <Btn variant="ghost">Termos de Uso</Btn>
             <Btn variant="ghost">DPA (Enterprise)</Btn>
           </div>
+
+          <div style={{marginTop:28,paddingTop:22,borderTop:`1px solid ${C.border}`}}>
+            <div style={{fontSize:15,fontWeight:700,color:C.text,marginBottom:6}}>Sua Conta</div>
+            <div style={{fontSize:12,color:C.muted,marginBottom:14}}>Excluir sua conta apaga permanentemente seu usuário e acesso ao painel. Não pode ser desfeito.</div>
+            <Btn variant="ghost" onClick={()=>setModalExcluir(true)}>Excluir minha conta</Btn>
+          </div>
+
+          {modalPrivacidade&&<Modal title="Política de Privacidade" wide onClose={()=>setModalPrivacidade(false)}>
+            <PoliticaPrivacidade/>
+          </Modal>}
+
+          {modalExcluir&&<Modal title="Excluir sua conta permanentemente?" onClose={()=>!excluindo&&setModalExcluir(false)}>
+            <div style={{fontSize:13,color:C.muted,lineHeight:1.6,marginBottom:20}}>
+              Isso apaga seu acesso de login ao MontaMovel para sempre. Essa ação não pode ser desfeita. Os registros operacionais da empresa (OS, clientes) permanecem, pois pertencem ao tenant, não à sua conta pessoal.
+            </div>
+            <div style={{display:"flex",gap:10,justifyContent:"flex-end"}}>
+              <Btn variant="ghost" onClick={()=>setModalExcluir(false)} disabled={excluindo}>Cancelar</Btn>
+              <Btn onClick={excluirMinhaConta} disabled={excluindo}>{excluindo?"Excluindo...":"Excluir permanentemente"}</Btn>
+            </div>
+          </Modal>}
         </>}
 
         {sec==="usuarios"&&<>
